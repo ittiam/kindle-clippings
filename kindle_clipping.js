@@ -46,17 +46,6 @@ Block.prototype.init = function() {
     }
 };
 
-/*
-浪客行 04卷 (Unknown)
-- 您在位置 #23 的书签 | 添加于 2014年8月23日星期六 上午10:56:56
-
-
-==========
-A Tale of Two Cities (Charles Dickens)
-- 您在位置 #92-93的标注 | 添加于 2014年9月16日星期二 下午9:39:55
-
-rough outlines—the father locked away in the
-*/
 function parse_blocks(paragraphs) {
 
     paragraphs = paragraphs.split('==========');
