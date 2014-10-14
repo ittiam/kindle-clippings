@@ -1,8 +1,26 @@
 var fs = require('fs');
 
+function isObject(obj) {
+    var type = typeof obj;
+    return type === 'function' || type === 'object' && !!obj;
+}
+
+function extend(obj) {
+    if(!isObject(obj)) return obj;
+    var source, prop;
+    for(var i = 1, length = arguments.length; i < length; i++) {
+        source = arguments[i];
+        for(prop in source) {
+            obj[prop] = source[prop];
+        }
+    }
+
+    return obj;
+}
+
 var helper = {
     split_created: function(text) {
-        var re = /#(\d+\-?\d+)\s*的(.*)\s+\|\s+添加于\s+(\d{4})年(\d{2})月(\d{2})日.*(上|下)午(\d{2}):(\d{2}):(\d{2})$/,
+        var re = /#(\d+\-?\d+)\s*的(.*)\s+\|\s+添加于\s+(\d{4})年(\d+)月(\d+)日.*(上|下)午(\d+):(\d+):(\d+)$/,
             match = re.exec(text);
 
         var m7 = +match[7];
@@ -45,19 +63,15 @@ Block.prototype.init = function() {
 
     var data = null;
 
-    data = helper.split_bool(para_arr[0]);
-    this.author = data.author;
-    this.book = data.book;
-
-    this.content = para_arr[3];
-
+    data = helper.split_book(para_arr[0]);
+    extend(this, data);
 
     if(para_arr[1]) {
         data = helper.split_created(para_arr[1]);
-        this.position = data.position;
-        this.type = data.type;
-        this.date = data.date;
+        extend(this, data);
     }
+
+    this.content = para_arr[3];
 
     data = null;
 };
@@ -66,15 +80,17 @@ function parse_blocks(paragraphs) {
 
     paragraphs = paragraphs.split('==========');
 
-    return paragraphs.map(parse_block);
+    var blocks = paragraphs.map(parse_block);
+
+    return blocks;
 }
 
 function parse_block(texts) {
     texts = texts.trim();
 
-    var block = new Block(texts);
+    if(!texts) return null;
 
-    return block;
+    return new Block(texts);
 }
 
 function read_file(path, callback) {
